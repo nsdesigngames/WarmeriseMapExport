@@ -2,7 +2,7 @@
 	"name": "com.warmerise.map.export",
 	"displayName": "Warmerise Map Export",
 	"description": "Package used to export maps from Unity to be used in Warmerise | Red vs Blue.",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"unity": "2019.4",
 	"repository": {
 		"type": "git",

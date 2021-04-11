@@ -260,14 +260,12 @@ namespace Warmerise.Map
         [MenuItem("Warmerise/Documentation/Tutorial PDF")]
         static void OpenTutorialPDF()
         {
-            Object pdf = AssetDatabase.LoadAssetAtPath("Packages/com.warmerise.map.export/Tutorials/CustomMapTutorial.pdf", typeof(Object));
-
-            if(pdf == null)
+            string pathToPDF = System.IO.Path.GetFullPath("Packages/com.warmerise.map.export/Tutorials/CustomMapTutorial.pdf");
+            if (!System.IO.File.Exists(pathToPDF))
             {
-                //Try local path
-                pdf = AssetDatabase.LoadAssetAtPath("Assets/WarmeriseMapExport/Tutorials/CustomMapTutorial.pdf", typeof(Object));
+                pathToPDF = System.IO.Path.GetFullPath("Assets/WarmeriseMapExport/Tutorials/CustomMapTutorial.pdf");
             }
-            string pathToPDF = System.IO.Path.Combine(System.IO.Directory.GetParent(Application.dataPath).FullName, AssetDatabase.GetAssetPath(pdf));
+
             if (System.IO.File.Exists(pathToPDF))
             {
                 System.Diagnostics.Process.Start(pathToPDF);
