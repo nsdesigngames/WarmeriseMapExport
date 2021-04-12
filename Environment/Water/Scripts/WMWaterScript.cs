@@ -14,12 +14,15 @@ namespace Warmerise.Map
         };
 
         public WaterMode waterMode = WaterMode.Reflective;
+
+        [HideInInspector]
+        public GameObject waterModeReference;
+
         bool disablePixelLights = true;
         int textureSize = 256;
         float clipPlaneOffset = 0.07f;
         LayerMask reflectLayers = -1;
         LayerMask refractLayers = -1;
-
 
         //private Dictionary<Camera, Camera> m_ReflectionCameras = new Dictionary<Camera, Camera>(); // Camera -> Camera table
         //private Dictionary<Camera, Camera> m_RefractionCameras = new Dictionary<Camera, Camera>(); // Camera -> Camera table
@@ -35,6 +38,8 @@ namespace Warmerise.Map
         Camera cam;
         Camera previousCam;
         GameObject camObj;
+
+        WaterMode previousWaterMode = WaterMode.Reflective;
 
         public void AssignReflectionLayers(int layers)
         {
@@ -183,6 +188,25 @@ namespace Warmerise.Map
             }
 
             s_InsideWater = false;
+
+            if (!waterModeReference)
+            {
+                waterModeReference = new GameObject("Mode:" + waterMode.ToString());
+                waterModeReference.transform.parent = transform;
+                waterModeReference.transform.localPosition = Vector3.zero;
+            }
+            else
+            {
+                if(previousWaterMode != waterMode)
+                {
+                    previousWaterMode = waterMode;
+                    waterModeReference.name = "Mode:" + waterMode.ToString();
+                    if(waterModeReference.transform.parent != transform)
+                    {
+                        waterModeReference.transform.parent = transform;
+                    }
+                }
+            }
         }
 
         // This just sets up some matrices in the material; for really
