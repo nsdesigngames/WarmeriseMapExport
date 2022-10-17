@@ -23,7 +23,7 @@ namespace Warmerise.Map
                 GameObject controlObject = null;
 
                 //Control objects
-                string[] controlObjects = new string[] { "_InvisibleWalls" , "_Snow/Dirt", "_MetalObjects" };
+                string[] controlObjects = new string[] { "_InvisibleWalls" , "_Snow/Dirt", "_MetalObjects", "_WoodObjects", "_GlassObjects", "_WaterObjects" };
                 for(int i = 0; i < controlObjects.Length; i++)
                 {
                     controlObject = new GameObject(controlObjects[i]);
@@ -113,6 +113,9 @@ namespace Warmerise.Map
                     laddersContainer.parent = _AllPoints.transform;
                     laddersContainer.localPosition = Vector3.zero;
                     laddersContainer.localRotation = Quaternion.identity;
+
+                    // Register root object for undo.
+                    Undo.RegisterCreatedObjectUndo(laddersContainer.gameObject, "Create ladders container");
                 }
 
                 //Create new ladder
@@ -120,8 +123,8 @@ namespace Warmerise.Map
                 GameObject ladderObject = new GameObject("MetalLadder");
                 ladderObject.transform.parent = laddersContainer;
                 //Move in front of Scene Camera
-                Camera sceneCamera = SceneView.lastActiveSceneView.camera;
-                ladderObject.transform.position = sceneCamera.transform.position + sceneCamera.transform.forward * 25;
+                ladderObject.transform.position = GetPointInFrontOfCamera(25);
+                ladderObject.transform.rotation = Quaternion.Euler(0, 180, 0);
                 //Select root object
                 Selection.objects = new Object[] { ladderObject };
 
@@ -166,6 +169,9 @@ namespace Warmerise.Map
                     doorContainer.parent = _AllPoints.transform;
                     doorContainer.localPosition = Vector3.zero;
                     doorContainer.localRotation = Quaternion.identity;
+
+                    // Register root object for undo.
+                    Undo.RegisterCreatedObjectUndo(doorContainer.gameObject, "Create doors container");
                 }
 
                 GameObject doorPrefab = Resources.Load("SimpleDoor") as GameObject;
@@ -175,8 +181,8 @@ namespace Warmerise.Map
                     GameObject instantiatedDoor = Instantiate(doorPrefab, _AllPoints.transform);
                     instantiatedDoor.transform.parent = doorContainer;
                     //Move in front of Scene Camera
-                    Camera sceneCamera = SceneView.lastActiveSceneView.camera;
-                    instantiatedDoor.transform.position = sceneCamera.transform.position + sceneCamera.transform.forward * 10;
+                    instantiatedDoor.transform.position = GetPointInFrontOfCamera(15);
+                    instantiatedDoor.transform.rotation = Quaternion.Euler(0, 90, 0);
                     //Select root object
                     Selection.objects = new Object[] { instantiatedDoor };
 
@@ -191,6 +197,60 @@ namespace Warmerise.Map
             else
             {
                 EditorUtility.DisplayDialog("Create New Door", "The object '_AllPoints' not found, please initialize it first.", "Ok");
+            }
+        }
+
+        [MenuItem("Warmerise/Workflow/Destructibles/Create New Destructible Vent")]
+        static void CreateDestructibleVent()
+        {
+            CreateDestructibleObject("Vent_Metal");
+        }
+
+        [MenuItem("Warmerise/Workflow/Destructibles/Create New Destructible Glass")]
+        static void CreateDestructibleGlass()
+        {
+            CreateDestructibleObject("Panel_GLass");
+        }
+
+        static void CreateDestructibleObject(string destructibleObjectToCreate)
+        {
+            GameObject _AllPoints = GameObject.Find("_AllPoints");
+            if (_AllPoints != null)
+            {
+                //Create Door container object if there none
+                Transform destructiblesContainer = _AllPoints.transform.Find("Destructibles");
+                if (destructiblesContainer == null)
+                {
+                    destructiblesContainer = (new GameObject("Destructibles")).transform;
+                    destructiblesContainer.parent = _AllPoints.transform;
+                    destructiblesContainer.localPosition = Vector3.zero;
+                    destructiblesContainer.localRotation = Quaternion.identity;
+
+                    // Register root object for undo.
+                    Undo.RegisterCreatedObjectUndo(destructiblesContainer.gameObject, "Create destructibles container");
+                }
+
+                GameObject objectPrefab = Resources.Load(destructibleObjectToCreate) as GameObject;
+
+                if (objectPrefab != null)
+                {
+                    GameObject instantiatedObject = Instantiate(objectPrefab, destructiblesContainer);
+                    //Move in front of Scene Camera
+                    instantiatedObject.transform.position = GetPointInFrontOfCamera(15);
+                    //Select root object
+                    Selection.objects = new Object[] { instantiatedObject };
+
+                    // Register root object for undo.
+                    Undo.RegisterCreatedObjectUndo(instantiatedObject, "Create destructible object");
+                }
+                else
+                {
+                    EditorUtility.DisplayDialog("Create Destructible Object", "Resource with the name '" + destructibleObjectToCreate + "' is missing, unable to create.", "Ok");
+                }
+            }
+            else
+            {
+                EditorUtility.DisplayDialog("Create Destructible Object", "The object '_AllPoints' not found, please initialize it first.", "Ok");
             }
         }
 
@@ -220,13 +280,12 @@ namespace Warmerise.Map
                     GameObject instantiatedWater = Instantiate(waterPrefab);
                     instantiatedWater.name = waterPlaneName;
                     //Move in front of Scene Camera
-                    Camera sceneCamera = SceneView.lastActiveSceneView.camera;
-                    instantiatedWater.transform.position = sceneCamera.transform.position + sceneCamera.transform.forward * 50;
+                    instantiatedWater.transform.position = GetPointInFrontOfCamera(50);
                     //Select root object
                     Selection.objects = new Object[] { instantiatedWater };
 
                     // Register root object for undo.
-                    Undo.RegisterCreatedObjectUndo(instantiatedWater, "Create custom object");
+                    Undo.RegisterCreatedObjectUndo(instantiatedWater, "Create water plane object");
                 }
                 else
                 {
@@ -275,6 +334,18 @@ namespace Warmerise.Map
             {
                 Debug.LogError("CustomMapTutorial.pdf does not exist.");
             }
+        }
+
+        static Vector3 GetPointInFrontOfCamera(int maxDistance)
+        {
+            Camera sceneCamera = SceneView.lastActiveSceneView.camera;
+            RaycastHit hit;
+            if (Physics.Raycast(sceneCamera.transform.position, sceneCamera.transform.forward, out hit, maxDistance))
+            {
+                return hit.point;
+            }
+
+            return sceneCamera.transform.position + sceneCamera.transform.forward * maxDistance;
         }
     }
 }

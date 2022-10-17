@@ -8,7 +8,7 @@ namespace Warmerise.Map
     public class DoorGizmo : MonoBehaviour
     {
         public Transform doorHinge;
-        public enum OpenDirection { Up, Down, Left, Right };
+        public enum OpenDirection { Up, Down, Left, Right, UpLeft, UpRight, DownLeft, DownRight };
         public OpenDirection openDirection = OpenDirection.Up;
 
         OpenDirection previousOpenDirection = OpenDirection.Down;
@@ -50,6 +50,26 @@ namespace Warmerise.Map
                 {
                     doorHinge.localPosition = new Vector3(0.25f, 1.725f, -1);
                     doorHinge.localEulerAngles = new Vector3(-90, 0, 0);
+                }
+                else if (openDirection == OpenDirection.UpLeft)
+                {
+                    doorHinge.localPosition = new Vector3(0.25f, 3.45f, -1);
+                    doorHinge.localEulerAngles = new Vector3(-45, 0, 0);
+                }
+                else if (openDirection == OpenDirection.UpRight)
+                {
+                    doorHinge.localPosition = new Vector3(0.25f, 3.45f, 1);
+                    doorHinge.localEulerAngles = new Vector3(45, 0, 0);
+                }
+                else if (openDirection == OpenDirection.DownLeft)
+                {
+                    doorHinge.localPosition = new Vector3(0.25f, -0.05f, -1);
+                    doorHinge.localEulerAngles = new Vector3(-135, 0, 0);
+                }
+                else if (openDirection == OpenDirection.DownRight)
+                {
+                    doorHinge.localPosition = new Vector3(0.25f, -0.05f, 1);
+                    doorHinge.localEulerAngles = new Vector3(135, 0, 0);
                 }
             }
 

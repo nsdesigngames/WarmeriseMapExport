@@ -23,7 +23,7 @@ namespace Warmerise.Map
         [HideInInspector]
         public GUIStyle handleTextStyle = new GUIStyle();
 
-        bool previousDisableRendering;
+        bool previousDisableRendering = false;
 
         public void InitializeStyles()
         {
